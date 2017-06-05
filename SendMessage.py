@@ -5,20 +5,31 @@ conn = sqlite3.connect('./log/database.db')
 c = conn.cursor()
 
 def send():
-	print 'Recipient?'
+	print '\nRecipient?'
 	recipient=raw_input()
 	c.execute('SELECT "Num" FROM "Contacts" WHERE "Name"="'+recipient+'"')		#Get phone number of contact
 	recipNum = c.fetchone()
 	if(recipNum==None):			#If recipient is not a contact, do not continue
-		print "Contact not found"
+		print "Contact not found\n"
 	else:
-		print 'Message?'
+		print '\nMessage?'
 		message=raw_input()
-		file = open('./outgoing/'+recipNum[0]+'.txt', 'w')	#Put message in .txt to send
-		file.write(message)
+		print '\n'
+		
+		file = open('./log/OutCount.txt', 'r') #Read count from .txt
+		oCount= file.read()
+		file.close()
+		file = open('./log/OutCount.txt', 'w') #increase count by 1
+		file.write(str(int(oCount)+1))
+		file.close()
+
+		file = open('./outgoing/'+str(oCount)+'.txt', 'w')	#Put message in .txt to send
+		file.write(recipNum[0] +'\n'+message)
 		file.close()
 
 		c.execute('CREATE TABLE IF NOT EXISTS "'+recipient+'" ("InOut" "TEXT", "Message" "TEXT", "TimeEntered" "TEXT" DEFAULT CURRENT_TIMESTAMP)')	#Create message log for this recipient
 		conn.commit()
-		c.execute("INSERT INTO "+recipient+" (InOut, Message) VALUES ('Out', '"+message+"')")	#Add message to recipient
+		c.execute("INSERT INTO "+recipient+" (InOut, Message) VALUES ('Out', '"+message.split('\n')[0]+"')")	#Add message to recipient
 		conn.commit()
+
+	conn.close()

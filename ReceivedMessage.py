@@ -1,27 +1,33 @@
 #!/usr/bin/python
 import sqlite3
+import os
+
+
 conn = sqlite3.connect('./log/database.db')
 c = conn.cursor()
 
-c.execute('CREATE TABLE IF NOT EXISTS "NewMessages" ("Contact" "TEXT", "Message" "TEXT")')
-conn.commit()
-import os
-path = './incoming/'
-if os.listdir(path)==[]:		#If no new messages
-	print "No new messages"
-else:
+def checkMsgs():
+	path = './incoming/'
+	count=0
 	for filename in os.listdir(path):
 		if filename.endswith('.txt'):
-			temp=filename.split('.')
-			numToConvert=temp[0]			#Get contact name
-			c.execute('SELECT "Name" FROM "Contacts" WHERE "Num"="'+numToConvert+'"')
+			count+=1
+			file = open(path+filename, 'r') #Read lines from .txt
+			lines= file.readlines()
+			file.close()
+			
+			numbr= lines[0].split('\n')[0]	#get rid of '\n'
+			c.execute('SELECT "Name" FROM "Contacts" WHERE "Num"="'+numbr+'"')
 			rec=c.fetchone()
 
-			file = open(path+filename, 'r') #Read message form .txt
-			inMsg= file.read()
-			file.close()
-
-			c.execute("INSERT INTO NewMessages (Contact, Message) VALUES ('"+rec[0]+"', '"+inMsg+"')") #insert into NewMessages
-			c.execute("INSERT INTO '"+rec[0]+"'(InOut, Message) VALUES ('In', '"+inMsg+"')") #Insert into Convo
+			c.execute('CREATE TABLE IF NOT EXISTS "'+rec[0]+'" ("InOut" "TEXT", "Message" "TEXT", "TimeEntered" "TEXT" DEFAULT CURRENT_TIMESTAMP)')	#Create message log for this
 			conn.commit()
+			c.execute("INSERT INTO '"+rec[0]+"'(InOut, Message) VALUES ('In', '"+lines[1].split('\n')[0]+"')") #Insert into Convo
+			conn.commit()
+
+			os.remove(path+filename)
+			print "\nFrom: "+rec[0]+"\nMessage: "+lines[1]+"\n"
+	if count==0:
+		print "\nNo new Messages\n"
+	conn.close()
 
