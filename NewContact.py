@@ -21,4 +21,3 @@ def enterNewContact():
 		 else:
 		 	print "Contact not updated\n"
 	conn.commit()
-	conn.close()

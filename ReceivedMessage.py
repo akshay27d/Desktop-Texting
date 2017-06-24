@@ -17,8 +17,24 @@ def checkMsgs():
 			file.close()
 			
 			numbr= lines[0].split('\n')[0]	#get rid of '\n'
-			c.execute('SELECT "Name" FROM "Contacts" WHERE "Num"="'+numbr+'"')
-			rec=c.fetchone()
+
+			try:
+				c.execute('SELECT "Name" FROM "Contacts" WHERE "Num"="'+numbr+'"')
+				rec=c.fetchone()
+				test = rec[0]
+			except Exception as e:
+					try:
+						c.execute('SELECT "Name" FROM "Contacts" WHERE "Num"="'+numbr[1:]+'"')
+						rec=c.fetchone()
+						test = rec[0]
+					except Exception as e:
+						try:
+							c.execute('SELECT "Name" FROM "Contacts" WHERE "Num"="'+numbr[2:]+'"')
+							rec=c.fetchone()
+							test = rec[0]
+						except Exception as e:
+							print "Did not work"
+
 
 			c.execute('CREATE TABLE IF NOT EXISTS "'+rec[0]+'" ("InOut" "TEXT", "Message" "TEXT", "TimeEntered" "TEXT" DEFAULT CURRENT_TIMESTAMP)')	#Create message log for this
 			conn.commit()
@@ -29,5 +45,4 @@ def checkMsgs():
 			print "\nFrom: "+rec[0]+"\nMessage: "+lines[1]+"\n"
 	if count==0:
 		print "\nNo new Messages\n"
-	conn.close()
 

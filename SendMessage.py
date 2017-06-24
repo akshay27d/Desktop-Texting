@@ -31,5 +31,3 @@ def send():
 		conn.commit()
 		c.execute("INSERT INTO "+recipient+" (InOut, Message) VALUES ('Out', '"+message.split('\n')[0]+"')")	#Add message to recipient
 		conn.commit()
-
-	conn.close()
