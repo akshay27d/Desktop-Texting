@@ -12,15 +12,18 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
+import java.io.FileNotFoundException;
 
 /**
  * Created by akshaydesai on 6/24/17.
  */
 
 public class BackgroundReceive extends IntentService {
-    protected int sentCount =-1;
     public BackgroundReceive() {
         super("BackgroundReceive");
     }
@@ -33,7 +36,6 @@ public class BackgroundReceive extends IntentService {
 
         String Info = (String) extras.get("num");
         String Info2 = (String) extras.get("msg");
-
 
         try {
             JSch jsch = new JSch();
@@ -55,9 +57,9 @@ public class BackgroundReceive extends IntentService {
 
             Context context = getApplication();
 
-            sentCount++;
-            createFile(Integer.toString(sentCount) + ".txt", Info+"\n"+Info2, context);
-            sftp.put(context.getFilesDir() + "/" +Integer.toString(sentCount) + ".txt", "Desktop/Desktop-Texting/incoming/"+Integer.toString(sentCount) + ".txt");
+            int outCount=getCounterNum();
+            createFile(Integer.toString(outCount) + ".txt", Info+"\n"+Info2, context);
+            sftp.put(context.getFilesDir() + "/" +Integer.toString(outCount) + ".txt", "Desktop/Desktop-Texting/incoming/"+Integer.toString(outCount) + ".txt");
 
 
 
@@ -80,5 +82,52 @@ public class BackgroundReceive extends IntentService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String[] readFile(String name, int length){                  //read file on local system
+        Context context = getApplication();
+        String arr[] = new String[length];
+        try {
+            FileInputStream fis = context.openFileInput(name);          //Reading a File
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            int i = 0;
+            while ((line = br.readLine()) != null) {         //Converting to String array
+                arr[i] = line;
+                i++;
+            }
+            br.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return arr;
+    }
+
+    public int getCounterNum(){
+        Context context = getApplication();
+        String arr[] = new String[1];
+        int outCount;
+
+        try {
+            FileInputStream fis = context.openFileInput("counter.txt");          //Reading a File
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            int i = 0;
+            while ((line = br.readLine()) != null) {         //Converting to String array
+                arr[i] = line;
+                i++;
+            }
+            br.close();
+            outCount = Integer.parseInt(arr[0]);
+        }catch(Exception e){
+            createFile("counter.txt","1", context);
+            outCount=0;
+        }
+        createFile("counter.txt",Integer.toString(outCount+1), context);
+
+        return outCount;
     }
 }
