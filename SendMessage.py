@@ -27,7 +27,8 @@ def send():
 		file.write(recipNum[0] +'\n'+message)
 		file.close()
 
+		message = message.replace("'","")
 		c.execute('CREATE TABLE IF NOT EXISTS "'+recipient+'" ("InOut" "TEXT", "Message" "TEXT", "TimeEntered" "TEXT" DEFAULT CURRENT_TIMESTAMP)')	#Create message log for this recipient
 		conn.commit()
-		c.execute("INSERT INTO "+recipient+" (InOut, Message) VALUES ('Out', '"+message.split('\n')[0]+"')")	#Add message to recipient
+		c.execute("INSERT INTO "+recipient+" (InOut, Message) VALUES ('Out', '"+message+"')")	#Add message to recipient
 		conn.commit()

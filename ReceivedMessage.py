@@ -1,6 +1,10 @@
 #!/usr/bin/python
 import sqlite3
 import os
+import sys  
+
+reload(sys)  
+sys.setdefaultencoding('utf8')
 
 
 conn = sqlite3.connect('./log/database.db')
@@ -36,13 +40,15 @@ def checkMsgs():
 							print "Received message from number not in Contacts"
 							doIt = False
 
-	
+			msg = lines[1]
+			msg = msg.replace("'","")
+
 			if doIt:
 				c.execute('CREATE TABLE IF NOT EXISTS "'+sender+'" ("InOut" "TEXT", "Message" "TEXT", "TimeEntered" "TEXT" DEFAULT CURRENT_TIMESTAMP)')	#Create message log for this
 				conn.commit()
-				c.execute("INSERT INTO "+sender+" (InOut, Message) VALUES ('In', '"+lines[1].split('\n')[0]+"')") #Insert into Convo
+				c.execute("INSERT INTO "+sender+" (InOut, Message) VALUES ('Out', '"+msg+"')")	#Add message to recipient
 				conn.commit()
-				print "\nFrom: "+sender+"\nMessage: "+lines[1]+"\n"
+				print "\nFrom: "+sender+"\nMessage: "+msg+"\n"
 
 			os.remove(path+filename)
 			
