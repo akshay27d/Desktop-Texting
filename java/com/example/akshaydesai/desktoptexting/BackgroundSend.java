@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 /**
  * Created by akshaydesai on 6/23/17.
@@ -38,8 +39,8 @@ public class BackgroundSend extends IntentService {
             try {
                 JSch jsch = new JSch();
 
-                Session session = jsch.getSession(--user--,--host--, 22);
-                session.setPassword(--password--);
+                Session session = jsch.getSession("user","host", 22);
+                session.setPassword("password");
 
                 // Avoid asking for key confirmation
                 Properties prop = new Properties();
@@ -83,7 +84,9 @@ public class BackgroundSend extends IntentService {
                     arr = readFile("FileRead.txt", length);
                     Log.d("GOOD", "sdf " + arr[0] + "\n" + arr[1]);  //Print 1st 2 lines
 
-                    smsManager.sendTextMessage(arr[0], null, arr[1], null, null);
+                    ArrayList<String> parts = smsManager.divideMessage(arr[1]);
+                    smsManager.sendMultipartTextMessage(arr[0], null, parts, null, null);
+
                     Log.d("YUP", "Got Here");
                     sftp.rm(entry.getFilename());
                 }

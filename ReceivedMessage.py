@@ -41,12 +41,12 @@ def checkMsgs():
 							doIt = False
 
 			msg = lines[1]
-			msg = msg.replace("'","")
+			msg = msg.replace("'", "`");
 
 			if doIt:
 				c.execute('CREATE TABLE IF NOT EXISTS "'+sender+'" ("InOut" "TEXT", "Message" "TEXT", "TimeEntered" "TEXT" DEFAULT CURRENT_TIMESTAMP)')	#Create message log for this
 				conn.commit()
-				c.execute("INSERT INTO "+sender+" (InOut, Message) VALUES ('Out', '"+msg+"')")	#Add message to recipient
+				c.execute("INSERT INTO "+sender+" (InOut, Message) VALUES ('Out', '"+msg+"')")				
 				conn.commit()
 				print "\nFrom: "+sender+"\nMessage: "+msg+"\n"
 

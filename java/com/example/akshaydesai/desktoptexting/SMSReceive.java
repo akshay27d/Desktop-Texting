@@ -33,7 +33,6 @@ public class SMSReceive extends BroadcastReceiver {
                     context.startService(serviceIntent);
 
 
-
                 }
             }
         } catch (Exception e){

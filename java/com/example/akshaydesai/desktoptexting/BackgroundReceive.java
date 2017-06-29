@@ -40,8 +40,8 @@ public class BackgroundReceive extends IntentService {
         try {
             JSch jsch = new JSch();
 
-            Session session = jsch.getSession(--user--,--host--, 22);
-            session.setPassword(--password--);
+            Session session = jsch.getSession("user","host", 22);
+            session.setPassword("password");
 
             // Avoid asking for key confirmation
             Properties prop = new Properties();
