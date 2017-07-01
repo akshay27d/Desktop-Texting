@@ -37,7 +37,7 @@ def checkMsgs():
 							rec=c.fetchone()
 							sender = rec[0]
 						except Exception as e:
-							print "Received message from number not in Contacts"
+							print "\nReceived message from number not in Contacts"
 							doIt = False
 
 			msg = lines[1]
@@ -46,7 +46,7 @@ def checkMsgs():
 			if doIt:
 				c.execute('CREATE TABLE IF NOT EXISTS "'+sender+'" ("InOut" "TEXT", "Message" "TEXT", "TimeEntered" "TEXT" DEFAULT CURRENT_TIMESTAMP)')	#Create message log for this
 				conn.commit()
-				c.execute("INSERT INTO "+sender+" (InOut, Message) VALUES ('Out', '"+msg+"')")				
+				c.execute("INSERT INTO "+sender+" (InOut, Message) VALUES ('In', '"+msg+"')")				
 				conn.commit()
 				print "\nFrom: "+sender+"\nMessage: "+msg+"\n"
 
