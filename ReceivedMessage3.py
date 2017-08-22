@@ -8,6 +8,7 @@ conn = sqlite3.connect('./log/database.db')
 c = conn.cursor()
 
 def checkMsgs():
+	retlist= []
 	path = './incoming/'
 	count=0
 	for filename in os.listdir(path):
@@ -20,7 +21,7 @@ def checkMsgs():
 			
 			numbr= lines[0].split('\n')[0]	#get rid of '\n'
 			try:
-				c.execute('SELECT "Name" FROM "Contacts" WHERE "Num"="'+numbr+'"')
+				c.cgexecute('SELECT "Name" FROM "Contacts" WHERE "Num"="'+numbr+'"')
 				rec=c.fetchone()
 				sender = rec[0]
 			except Exception as e:
@@ -34,7 +35,7 @@ def checkMsgs():
 							rec=c.fetchone()
 							sender = rec[0]
 						except Exception as e:
-							print "\nReceived message from number not in Contacts"
+							print ("\nReceived message from number not in Contacts")
 							doIt = False
 
 			msg = lines[1]
@@ -45,10 +46,12 @@ def checkMsgs():
 				conn.commit()
 				c.execute("INSERT INTO "+sender+" (InOut, Message) VALUES ('In', '"+msg+"')")				
 				conn.commit()
-				print "\nFrom: "+sender+"\nMessage: "+msg+"\n"
-
+				# print ("\nFrom: "+sender+"\nMessage: "+msg+"\n")
+				retlist.append([sender,msg])
 			os.remove(path+filename)
-			
-	if count==0:
-		print "\nNo new Messages\n"
+	
+	return retlist
+	# if count==0:
+	# 	print ("\nNo new Messages\n")
+
 
